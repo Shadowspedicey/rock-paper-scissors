@@ -1,138 +1,217 @@
+let transitioned = false;
 let playerScore = 0;
 let computerScore = 0;
-let round = 1;
+let round = 0;
 
-const computerSelection = function()
+//On click store the selectedOpp in a var and transition
+let selectedOpponent;
+function AddOppEventListeners()
 {
+  const opponents = document.querySelectorAll(".opponent");
+  opponents.forEach(function(opponent)
+{
+  opponent.addEventListener("click", function()
+  {
+    if (!transitioned)
+    {
+      document.querySelector("#choose-opponent").style.opacity = "0";
+      selectedOpponent = opponent;
+      window.setTimeout(() => document.querySelector("#choose-opponent").remove(), 500);
+      TransitionToGame();
+    }
+  });
+});
+}
+AddOppEventListeners();
+
+let opponentImg = document.querySelector("#opponent-img").children[0];
+function TransitionToGame()
+{
+  transitioned = true;
+  document.querySelector("#game").classList.toggle("disabled");
+
+  //Changes the opponent image to the selected one
+  opponentImg.src = selectedOpponent.children[0].children[0].src;
+}
+
+window.addEventListener("keydown", (e) =>
+{
+  if (e.keyCode === 192)
+  {
+    let userInput = prompt("What do you want?");
+    userInput = userInput.toLowerCase();
+    userInput = userInput.charAt(0).toUpperCase() + userInput.slice(1);
+    if (userInput === "Maya")
+    {
+      AddNewOpponent(userInput)
+    }
+  }
+});
+
+function AddNewOpponent(name)
+{
+  let mainDiv = document.createElement("div");
+  mainDiv.classList.add("opponent") ;
+
+  let figure = document.createElement("figure");
+  let oppImage = document.createElement("img");
+  oppImage.src = "images/opponents/" + name + ".png";
+  let oppName = document.createElement("figcaption");
+  oppName.innerText = name;
+  oppName.classList.add("opponent-name");
+
+  figure.appendChild(oppImage);
+  figure.appendChild(oppName);
+  mainDiv.appendChild(figure);
+  document.querySelector("#opponents").appendChild(mainDiv);
+
+  AddOppEventListeners();
+}
+
+let computerSelectionURL;
+const ComputerSelection = function()
+{
+  let index = Math.floor(Math.random() * 3);
   const choices = ["Rock", "Paper", "Scissors"];
-  let choice = choices[Math.floor(Math.random() * 3)];
+  const choicesURL = ["images/Computer-Rock.png", "images/Computer-Paper.png", "images/Computer-Scissors.png"]
+  console.log(index, choices[index], choicesURL[index]);
+  let choice = choices[index];
+  computerSelectionURL = choicesURL[index];
   return choice;
 }
 
-const playerSelection = function()
-{
-  let response = "";
-  response = prompt("Type your selection!").toString();
-  response = response.toLowerCase();
-  response = response.charAt(0).toUpperCase() + response.slice(1);
 
-  if (response === ("Rock") || response === ("Paper") || response === ("Scissors"))
+const playerChoices = document.querySelectorAll(".rps-choice");
+playerChoices.forEach((choice) =>
+{
+  choice.addEventListener("click", () =>
   {
-    return response;
-  }
-  else if (response == 0)
-  {
-    alert("Hey asshole, Type your fucking selection.");
-    return playerSelection();
-  }
-  else
-  {
-    alert("Something's not right! Choose between Rock, Paper or Scissors.");
-    return playerSelection();
-  }
+    let playerChoice = choice.id;
+
+    document.querySelector("#player-choice").querySelector("img").src = choice.querySelector("img").src;
+    document.querySelector("#player-choices").classList.toggle("disabled");
+    PlayRound(playerChoice)
+  });
+});
+
+//text is the text at the bottom of the page
+const text = document.querySelector("#text").querySelector("p");
+const playerScoretxt = document.querySelector("#player-score-text-p");
+const opponentScoretxt = document.querySelector("#opponent-score-text").children[1];
+function ResetRound()
+{
+  document.querySelector("#player-choice").querySelector("img").src = "images/Transparent.png";
+  document.querySelector("#player-choices").classList.toggle("disabled");
+  document.querySelector("#opponent-choice").querySelector("img").src = "images/Transparent.png"
+  text.innerText = "";
 }
 
-function playRound(_playerSelection, _computerSelection)
+function PlayRound(_playerSelection)
 {
-  _playerSelection = playerSelection();
-  _computerSelection = computerSelection();
+  console.log(opponentScoretxt);
+  let _computerSelection = ComputerSelection();
+  document.querySelector("#opponent-choice").querySelector("img").src = computerSelectionURL;
 
   if (_playerSelection === "Rock")
   {
     if (_computerSelection === _playerSelection)
     {
-      console.log("Tie.");
-      console.log("Player score is: " + playerScore + ".");
-      console.log("Computer score is: " + computerScore + ".");
-      console.log("Round number " + round) + ".";
+      text.innerText = ("Tie.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
     else if (_computerSelection === "Scissors")
     {
       playerScore++;
-      console.log("You win this round! Fuck you AI.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      text.innerText = ("You win this round! Fuck you AI.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
     else if (_computerSelection === "Paper")
     {
       computerScore++;
-      console.log("Fuck. You lost this one, champ.");
-      console.log("Player score is: " + playerScore + ".")
-      console.log("Computer score is: " + computerScore + ".")
-      console.log("Round number " + round + ".")
+      text.innerText = ("Fuck. You lost this one, champ.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
   }
   else if (_playerSelection === "Scissors")
   {
     if (_computerSelection === _playerSelection)
     {
-      console.log("Tie.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      text.innerText = ("Tie.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
     else if (_computerSelection === "Rock")
     {
-      playerScore++;
-      console.log("You win this round! Fuck you AI.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      computerScore++;
+      text.innerText = ("Fuck. You lost this one, champ.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
     else if (_computerSelection === "Paper")
     {
-      computerScore++;
-      console.log("Fuck. You lost this one, champ.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      playerScore++;
+      text.innerText = ("You win this round! Fuck you AI.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
   }
   else if (_playerSelection === "Paper")
   {
     if (_computerSelection === _playerSelection)
     {
-      console.log("Tie.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      text.innerText = ("Tie.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
     else if (_computerSelection === "Rock")
     {
       playerScore++;
-      console.log("You win this round! Fuck you AI.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      text.innerText = ("You win this round! Fuck you AI.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
-    else if (_computerSelection === "Paper")
+    else if (_computerSelection === "Scissors")
     {
-      playerScore++;
-      console.log("Fuck. You lost this one, champ.");
-      console.log("Player score is: " + playerScore) + ".";
-      console.log("Computer score is: " + computerScore) + ".";
-      console.log("Round number " + round) + ".";
+      computerScore++;
+      text.innerText = ("Fuck. You lost this one, champ.");
+      playerScoretxt.innerText = playerScore;
+      opponentScoretxt.innerText = computerScore;
     }
   }
   round++;
-}
+  document.querySelector("#round-text-p").innerText = round;
 
-function game()
-{
-  for (let i = 0; i < 5; i++)
+  if (playerScore < 5 && computerScore < 5)
   {
-    playRound();
+    window.setTimeout(() => ResetRound(), 2500);
   }
-
-  if (playerScore > computerScore)
+  else if (playerScore === 5)
   {
-    console.log("Player won!");
+    text.innerText = "Ayyyy. You won!"
   }
   else
   {
-    console.log("Computer won!");
+    text.innerText = "You lost to a fucking computer, bruv."
   }
 }
 
-game();
+//5 Round Game Function
+// function game()
+// {
+//   for (let i = 0; i < 5; i++)
+//   {
+//     playRound();
+//   }
+
+//   if (playerScore > computerScore)
+//   {
+//     console.log("Player won!");
+//   }
+//   else
+//   {
+//     console.log("Computer won!");
+//   }
+// }
