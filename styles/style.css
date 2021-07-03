@@ -111,6 +111,17 @@ img
   margin: 0.75rem 0;
 }
 
+#AddOpp
+{
+  margin-top: 5rem !important;
+  transition: 100ms;
+}
+#AddOpp:hover
+{
+  transform: scale(1.125);
+  cursor: pointer;
+}
+
 #game
 {
   width: 100%;

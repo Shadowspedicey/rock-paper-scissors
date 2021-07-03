@@ -2,6 +2,7 @@ let transitioned = false;
 let playerScore = 0;
 let computerScore = 0;
 let round = 0;
+const names = ["Maya", "Mahmoud"];
 
 //On click store the selectedOpp in a var and transition
 let selectedOpponent;
@@ -34,18 +35,31 @@ function TransitionToGame()
   opponentImg.src = selectedOpponent.children[0].children[0].src;
 }
 
+function AddOppInput()
+{
+  let userInput = prompt("What do you want?");
+  userInput = userInput.toLowerCase();
+  userInput = userInput.charAt(0).toUpperCase() + userInput.slice(1);
+  names.forEach((name) =>
+  {
+    if (userInput === name) 
+    {
+      AddNewOpponent(userInput);
+    }
+  });
+}
+
 window.addEventListener("keydown", (e) =>
 {
   if (e.keyCode === 192)
   {
-    let userInput = prompt("What do you want?");
-    userInput = userInput.toLowerCase();
-    userInput = userInput.charAt(0).toUpperCase() + userInput.slice(1);
-    if (userInput === "Maya")
-    {
-      AddNewOpponent(userInput)
-    }
+    AddOppInput();
   }
+});
+
+document.querySelector("#AddOpp").addEventListener("click", () =>
+{
+  AddOppInput();
 });
 
 function AddNewOpponent(name)
